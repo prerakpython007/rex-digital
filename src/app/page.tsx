@@ -3,6 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import VerticalNavbar from "./components/Navbar"
+import AboutSection from "./components/About-us"
 
 const RexDigitalLanding: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -10,6 +11,7 @@ const RexDigitalLanding: React.FC = () => {
   const [showNavbar, setShowNavbar] = useState<boolean>(false)
   const [loadingProgress, setLoadingProgress] = useState<number>(0)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [isMobile, setIsMobile] = useState<boolean>(false)
 
   // Track mouse position for cursor effects
   useEffect(() => {
@@ -21,6 +23,20 @@ const RexDigitalLanding: React.FC = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove)
   }, [])
 
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent.toLowerCase()
+      const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent)
+      const isSmallScreen = window.innerWidth <= 768
+      setIsMobile(isMobileDevice || isSmallScreen)
+    }
+
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
+
   // Handle loading sequence with progress
   useEffect(() => {
     const progressInterval = setInterval(() => {
@@ -29,26 +45,23 @@ const RexDigitalLanding: React.FC = () => {
           clearInterval(progressInterval)
           return 100
         }
-        return prev + Math.random() * 2 + 0.5
+        return prev + Math.random() * 2 + 1
       })
-    }, 80)
+    }, 100)
 
     const loadingTimer = setTimeout(() => {
       setLoadingProgress(100)
       setTimeout(() => {
         setIsLoading(false)
-
-        const showTimer = setTimeout(() => {
+        setTimeout(() => {
           setShowLanding(true)
           // Show navbar after landing page appears
           setTimeout(() => {
             setShowNavbar(true)
-          }, 500)
-        }, 500)
-
-        return () => clearTimeout(showTimer)
-      }, 1200)
-    }, 3500)
+          }, 300)
+        }, 200)
+      }, 800)
+    }, 2500)
 
     return () => {
       clearTimeout(loadingTimer)
@@ -60,7 +73,7 @@ const RexDigitalLanding: React.FC = () => {
     <>
       <style jsx>{`
         /* Import Premium Fonts */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&family=Playfair+Display:wght@300;400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap');
         
         /* Custom cursor */
         * {
@@ -90,51 +103,54 @@ const RexDigitalLanding: React.FC = () => {
           transition: all 0.3s ease;
         }
 
-        /* Premium Loading Styles */
+        /* Minimal Loading Styles */
         .loading-container {
-          background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
-          backdrop-filter: blur(20px);
+          background: #000000;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 10000;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
         }
         
         .loading-logo {
-          font-family: 'Playfair Display', serif;
-          background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 50%, #e8e8e8 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
+          font-family: 'Inter', sans-serif;
+          font-weight: 200;
+          color: #ffffff;
+          letter-spacing: 0.2em;
+          margin-bottom: 3rem;
+          opacity: 0.9;
+        }
+        
+        .loading-bar-container {
+          width: 200px;
+          height: 1px;
+          background: rgba(255, 255, 255, 0.1);
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .loading-bar {
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          background: #ff6b35;
+          transition: width 0.3s ease-out;
+        }
+        
+        .loading-percentage {
+          font-family: 'Inter', sans-serif;
+          font-weight: 300;
+          font-size: 0.75rem;
+          color: rgba(255, 255, 255, 0.6);
+          margin-top: 1rem;
           letter-spacing: 0.1em;
-        }
-        
-        .loading-progress-container {
-          background: rgba(255, 255, 255, 0.05);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .loading-progress-bar {
-          background: linear-gradient(90deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0.8) 100%);
-          box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-        }
-        
-        .loading-dots {
-          display: flex;
-          gap: 8px;
-        }
-        
-        .loading-dot {
-          width: 4px;
-          height: 4px;
-          background: rgba(255, 255, 255, 0.6);
-          border-radius: 50%;
-          animation: loadingDots 1.5s ease-in-out infinite;
-        }
-        
-        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
-        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
-        
-        @keyframes loadingDots {
-          0%, 80%, 100% { opacity: 0.3; transform: scale(1); }
-          40% { opacity: 1; transform: scale(1.2); }
         }
 
         /* Premium Title Font */
@@ -174,40 +190,6 @@ const RexDigitalLanding: React.FC = () => {
           filter: brightness(1.1);
         }
 
-        /* Existing animations and styles */
-        .bg-particle-orange {
-          background: radial-gradient(circle, rgba(255, 107, 53, 0.8), rgba(255, 107, 53, 0.2), transparent);
-        }
-        
-        .bg-particle-red {
-          background: radial-gradient(circle, rgba(255, 69, 0, 0.8), rgba(255, 69, 0, 0.2), transparent);
-        }
-        
-        .bg-particle-yellow {
-          background: radial-gradient(circle, rgba(255, 140, 0, 0.8), rgba(255, 140, 0, 0.2), transparent);
-        }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
-          10% { opacity: 0.8; }
-          90% { opacity: 0.8; }
-          50% { transform: translateY(-120px) rotate(180deg); opacity: 0.9; }
-        }
-        
-        @keyframes float-slow {
-          0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
-          10% { opacity: 0.7; }
-          90% { opacity: 0.7; }
-          50% { transform: translateY(-140px) rotate(180deg); opacity: 0.8; }
-        }
-        
-        @keyframes float-slower {
-          0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
-          10% { opacity: 0.6; }
-          90% { opacity: 0.6; }
-          50% { transform: translateY(-100px) rotate(180deg); opacity: 0.7; }
-        }
-        
         @keyframes text-float {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-8px); }
@@ -222,24 +204,8 @@ const RexDigitalLanding: React.FC = () => {
           }
         }
 
-        .animate-float { animation: float 6s infinite ease-in-out; }
-        .animate-float-slow { animation: float-slow 8s infinite ease-in-out; }
-        .animate-float-slower { animation: float-slower 10s infinite ease-in-out; }
         .animate-text-float { animation: text-float 4s ease-in-out infinite; }
         .animate-glow { animation: glow 3s ease-in-out infinite; }
-
-        /* Video centering and stability */
-        .video-container {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          min-width: 100%;
-          min-height: 100%;
-          width: auto;
-          height: auto;
-          transform: translate(-50%, -50%);
-          z-index: -20;
-        }
 
         /* Minimal Corner Angles */
         .corner-angle {
@@ -284,19 +250,25 @@ const RexDigitalLanding: React.FC = () => {
           font-family: 'Exo 2', sans-serif;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 640px) {
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+          .custom-cursor, .cursor-trail {
+            display: none !important;
+          }
+          
+          .interactive-element:hover {
+            transform: none;
+            filter: none;
+          }
+          
+          .animate-text-float,
+          .animate-glow {
+            animation: none;
+          }
+          
           .corner-angle {
             width: 25px;
             height: 25px;
-          }
-          
-          .custom-cursor {
-            display: none;
-          }
-          
-          .cursor-trail {
-            display: none;
           }
         }
 
@@ -304,24 +276,69 @@ const RexDigitalLanding: React.FC = () => {
         .bg-radial-gradient {
           background: radial-gradient(ellipse at center, rgba(255,107,53,0.05) 0%, rgba(0,0,0,0.95) 70%);
         }
+
+        /* Video Background Styles */
+        .video-container {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          min-width: 100%;
+          min-height: 100%;
+          width: auto;
+          height: auto;
+          transform: translate(-50%, -50%);
+          z-index: -20;
+          will-change: transform;
+          backface-visibility: hidden;
+          object-fit: cover;
+        }
+        
+        /* Mobile Video Optimizations */
+        @media (max-width: 768px) {
+          .video-container {
+            transform: translate(-50%, -50%) scale(1.2);
+            height: 100%;
+            width: auto;
+            min-width: 100%;
+            min-height: 100%;
+            object-fit: cover;
+          }
+        }
       `}</style>
 
-      <div className="m-0 p-0 font-exo overflow-hidden bg-black min-h-screen relative">
-        {/* Custom Cursor */}
+      <div className="m-0 p-0 font-exo overflow-hidden border-black h-screen rounded-[98px] border-8 relative">
+        {/* Custom Cursor - Desktop Only */}
+        {!isMobile && (
+          <>
+            <div
+              className="custom-cursor"
+              style={{
+                left: mousePosition.x - 10,
+                top: mousePosition.y - 10,
+              }}
+            />
+            <div
+              className="cursor-trail"
+              style={{
+                left: mousePosition.x - 4,
+                top: mousePosition.y - 4,
+              }}
+            />
+          </>
+        )}
+
+        {/* Minimal Loading Screen */}
         <div
-          className="custom-cursor"
-          style={{
-            left: mousePosition.x - 10,
-            top: mousePosition.y - 10,
-          }}
-        />
-        <div
-          className="cursor-trail"
-          style={{
-            left: mousePosition.x - 4,
-            top: mousePosition.y - 4,
-          }}
-        />
+          className={`loading-container transition-opacity duration-500 ease-out ${
+            isLoading ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+        >
+          <h1 className="loading-logo text-2xl md:text-3xl">REX DIGITAL</h1>
+          <div className="loading-bar-container">
+            <div className="loading-bar" style={{ width: `${loadingProgress}%` }}></div>
+          </div>
+          <div className="loading-percentage">{Math.round(loadingProgress)}%</div>
+        </div>
 
         {/* Web Designs Text at Top Center */}
         <div className="fixed top-8 left-1/2 transform -translate-x-1/2 z-20">
@@ -337,46 +354,13 @@ const RexDigitalLanding: React.FC = () => {
         {/* Vertical Navbar Component - Only show after loading */}
         <VerticalNavbar show={showNavbar} />
 
-        {/* Premium Loading Screen */}
-        <div
-          className={`loading-container fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center z-[1000] transition-all duration-1000 ease-out ${
-            isLoading ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
-        >
-          {/* Loading Logo */}
-          <div className="mb-16 text-center">
-            <h1 className="loading-logo text-4xl md:text-5xl lg:text-6xl font-light tracking-wider">REX DIGITAL</h1>
-            <div className="loading-dots mt-8 justify-center">
-              <div className="loading-dot"></div>
-              <div className="loading-dot"></div>
-              <div className="loading-dot"></div>
-            </div>
-          </div>
-
-          {/* Progress Container */}
-          <div className="w-80 md:w-96 max-w-md">
-            {/* Progress Bar */}
-            <div className="loading-progress-container w-full h-[1px] rounded-full mb-4 relative overflow-hidden">
-              <div
-                className="loading-progress-bar h-full transition-all duration-300 ease-out"
-                style={{ width: `${loadingProgress}%` }}
-              ></div>
-            </div>
-
-            {/* Progress Text */}
-            <div className="text-center">
-              <span className="text-white/60 text-xs font-light tracking-widest">{Math.round(loadingProgress)}%</span>
-            </div>
-          </div>
-        </div>
-
         {/* Main Landing Page */}
         <div
           className={`relative w-full h-screen flex justify-center items-center transition-all duration-1000 ease-in ${
             showLanding ? "opacity-100 scale-100" : "opacity-0 scale-105"
           }`}
         >
-          {/* Enhanced Video Background with Quality Optimization */}
+          {/* Video Background - Now for all devices */}
           <video
             className="video-container"
             autoPlay
@@ -386,27 +370,14 @@ const RexDigitalLanding: React.FC = () => {
             preload="auto"
             poster="/video-poster.jpg"
             style={{
-              filter: "brightness(0.6) contrast(1.1) saturate(1.1)",
-              objectFit: "cover",
-            }}
-            onLoadStart={() => console.log("Video loading started")}
-            onCanPlay={() => console.log("Video can play")}
-            onError={(e) => {
-              console.log("Video failed to load, using fallback background")
-              e.currentTarget.style.display = "none"
-              const fallback = document.createElement("div")
-              fallback.className = "video-container bg-gradient-to-br from-gray-900 via-black to-orange-900"
-              fallback.style.background =
-                "radial-gradient(ellipse at center, rgba(255,107,53,0.05) 0%, rgba(0,0,0,0.95) 70%)"
-              e.currentTarget.parentNode?.appendChild(fallback)
+              filter: isMobile ? "brightness(0.6) contrast(1.05)" : "brightness(0.7) contrast(1.05)",
             }}
           >
-            <source src="/bg1.mp4" type="video/mp4" />
+            <source className="fixed"  src="/bg1.mp4" type="video/mp4" />
             <source src="/bg.webm" type="video/webm" />
-            Your browser does not support the video tag.
           </video>
 
-          {/* Enhanced Video Overlay */}
+          {/* Enhanced Overlay */}
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black/30 via-transparent to-black/50 -z-10"></div>
           <div className="absolute top-0 left-0 w-full h-full bg-radial-gradient -z-10"></div>
 
@@ -422,13 +393,15 @@ const RexDigitalLanding: React.FC = () => {
               REX DIGITAL
             </h1>
 
-            {/* Enhanced Slogan - Keeping Original Style */}
+            {/* Enhanced Slogan */}
             <div className="text-sm sm:text-base md:text-lg lg:text-xl font-medium text-orange-500 tracking-[1px] sm:tracking-[2px] uppercase border-2 border-orange-500 py-3 sm:py-4 px-6 sm:px-8 rounded-full inline-block backdrop-blur-sm bg-orange-500/10 transition-all duration-300 hover:bg-orange-500/20 hover:-translate-y-1 hover:drop-shadow-[0_15px_35px_rgba(255,107,53,0.4)] animate-glow cursor-pointer font-exo">
               Crafting Digital Excellence
             </div>
           </div>
         </div>
+        
       </div>
+      <AboutSection/>
     </>
   )
 }
