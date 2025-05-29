@@ -24,7 +24,7 @@ const AboutSection = () => {
   }, [])
 
   return (
-    <section id="about-section" className="relative min-h-screen w-full py-24 px-4 sm:px-6 lg:px-8">
+    <section id="about-section" className="relative w-full py-24 bg-[#000101] px-4 sm:px-6 lg:px-8">
       <style jsx>{`
         .glass-card {
           background: rgba(255, 255, 255, 0.05);

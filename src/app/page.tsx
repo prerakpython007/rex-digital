@@ -12,6 +12,7 @@ const RexDigitalLanding: React.FC = () => {
   const [loadingProgress, setLoadingProgress] = useState<number>(0)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isMobile, setIsMobile] = useState<boolean>(false)
+  const [scrollPosition, setScrollPosition] = useState(0)
 
   // Track mouse position for cursor effects
   useEffect(() => {
@@ -35,6 +36,16 @@ const RexDigitalLanding: React.FC = () => {
     checkMobile()
     window.addEventListener("resize", checkMobile)
     return () => window.removeEventListener("resize", checkMobile)
+  }, [])
+
+  // Track scroll position for parallax effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollPosition(window.scrollY)
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   // Handle loading sequence with progress
@@ -279,7 +290,7 @@ const RexDigitalLanding: React.FC = () => {
 
         /* Video Background Styles */
         .video-container {
-          position: fixed;
+          position: absolute;
           top: 50%;
           left: 50%;
           min-width: 100%;
@@ -291,6 +302,16 @@ const RexDigitalLanding: React.FC = () => {
           will-change: transform;
           backface-visibility: hidden;
           object-fit: cover;
+        }
+
+        .parallax-container {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          z-index: -10;
         }
         
         /* Mobile Video Optimizations */
@@ -306,7 +327,7 @@ const RexDigitalLanding: React.FC = () => {
         }
       `}</style>
 
-      <div className="m-0 p-0 font-exo overflow-hidden border-black h-screen rounded-[98px] border-8 relative">
+      <div className="m-0 p-0 font-exo border-black  h-screen  border-8 relative overflow-hidden">
         {/* Custom Cursor - Desktop Only */}
         {!isMobile && (
           <>
@@ -360,22 +381,29 @@ const RexDigitalLanding: React.FC = () => {
             showLanding ? "opacity-100 scale-100" : "opacity-0 scale-105"
           }`}
         >
-          {/* Video Background - Now for all devices */}
-          <video
-            className="video-container"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            poster="/video-poster.jpg"
+          {/* Video Background with Parallax Effect */}
+          <div
+            className="parallax-container"
             style={{
-              filter: isMobile ? "brightness(0.6) contrast(1.05)" : "brightness(0.7) contrast(1.05)",
+              transform: `translateY(${scrollPosition * 0.5}px)`,
             }}
           >
-            <source className="fixed"  src="/bg1.mp4" type="video/mp4" />
-            <source src="/bg.webm" type="video/webm" />
-          </video>
+            <video
+              className="video-container"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              poster="/video-poster.jpg"
+              style={{
+                filter: isMobile ? "brightness(0.6) contrast(1.05)" : "brightness(0.7) contrast(1.05)",
+              }}
+            >
+              <source src="/bg1.mp4" type="video/mp4" />
+              <source src="/bg.webm" type="video/webm" />
+            </video>
+          </div>
 
           {/* Enhanced Overlay */}
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black/30 via-transparent to-black/50 -z-10"></div>
@@ -399,9 +427,14 @@ const RexDigitalLanding: React.FC = () => {
             </div>
           </div>
         </div>
-        
+
+        {/* About Section */}
       </div>
-      <AboutSection/>
+        
+        
+        <AboutSection />
+
+        {/* Footer or additional sections can be added here */}
     </>
   )
 }
