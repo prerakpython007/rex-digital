@@ -4,21 +4,10 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import VerticalNavbar from "./components/Navbar"
 
-interface Particle {
-  id: number
-  size: number
-  left: number
-  top: number
-  delay: number
-  className: string
-  animation: string
-}
-
 const RexDigitalLanding: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [showLanding, setShowLanding] = useState<boolean>(false)
   const [showNavbar, setShowNavbar] = useState<boolean>(false)
-  const [particles, setParticles] = useState<Particle[]>([])
   const [loadingProgress, setLoadingProgress] = useState<number>(0)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
@@ -30,26 +19,6 @@ const RexDigitalLanding: React.FC = () => {
 
     window.addEventListener("mousemove", handleMouseMove)
     return () => window.removeEventListener("mousemove", handleMouseMove)
-  }, [])
-
-  // Create particles on component mount
-  useEffect(() => {
-    const createParticles = (): Particle[] => {
-      const particleClasses = ["bg-particle-orange", "bg-particle-red", "bg-particle-yellow"]
-      const animations = ["animate-float", "animate-float-slow", "animate-float-slower"]
-
-      return Array.from({ length: 80 }, (_, i) => ({
-        id: i,
-        size: Math.random() * 8 + 2,
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        delay: Math.random() * 8,
-        className: particleClasses[i % 3],
-        animation: animations[i % 3],
-      }))
-    }
-
-    setParticles(createParticles())
   }, [])
 
   // Handle loading sequence with progress
